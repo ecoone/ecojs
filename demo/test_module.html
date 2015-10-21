@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>ecojs模块定义加载测试</title>
+      <script src="../src/eco.js"></script>
+      <script src="ecoConfig.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+//页面中定义模块
+eco.define("ecoModule1", ['ecoModule2'], function(ecoModule2) {
+	console.log("ecoModule1");
+	return {
+		sayHello: function() {
+			alert("hello,ecoModule1");
+			ecoModule2.sayHello();
+		}
+	}
+});
+eco.define("ecoModule2", function() {
+	console.log("ecoModule2")
+	return {
+		sayHello: function() {
+			alert("hello,ecoModule2");
+		}
+	}
+});
+eco.namespace("mniya");
+mniya.define("module3", ["styleModule"], function() {
+	console.log("module3")
+	return {
+		sayHello: function() {
+			alert("hello,module3");
+		}
+	}
+});
+mniya.define("module4", ["styleModule"], function() {
+	console.log("module4")
+	return {
+		sayHello: function() {
+			alert("hello,module4");
+		}
+	}
+});
+// eco.use(['mniya'],["ecoModule1","mniya.module4"],function(ecoModule1,module1){
+// 	ecoModule1.sayHello();
+// 	module1.sayHello();
+// });
+// eco.use(['mniya'],["mniya.module4"],function(module4){
+// 	module4.sayHello();
+// });
+
+// eco.use(["ecoModule1","mniya.module1"],function(ecoModule1,module1){
+// 	ecoModule1.sayHello();
+// 	module1.sayHello();
+// });
+
+// mniya.use(["mniya"],["ecoModule1","module1"],function(ecoModule1,module1){
+// 	ecoModule1.sayHello();
+// 	module1.sayHello();
+// });
+</script>
+</body>
+</html>

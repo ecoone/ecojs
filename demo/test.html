@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>ecojs测试</title>
+      <script src="eco.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    eco.namespace("mniya");
+
+    //global方法测试
+    mniya.global({
+      adminUrl:"http://www.baidu.com",
+      name:"niuzhiheng"
+    });
+    mniya.attr({
+      api:{
+        baseUrl:"http://127.0.0.1"
+      },
+
+    })
+    console.log(mniya.global());
+    mniya.global("dev",{
+      adminUrl:"http://127.0.0.1"
+    });
+    console.log(mniya.global("dev"));
+    console.log(mniya.global());
+    mniya.env("dev");
+    console.log(mniya.global());
+    console.log("env:"+mniya.env())
+
+    //元数据测试
+    mniya.meta({
+      name:"超级系统",
+      author:"niuzhiheng",
+      version:"0.0.1",
+      description:"非常好的一个框架",
+      participator:"niuzhiheng"
+    });
+    console.log(mniya.meta());
+
+    //模块测试
+    mniya.define("module1",["module2"],function(module2){
+      console.log("module1")
+          return {
+            sayHello:function(){
+              alert("hello,word");
+              module2.sayHello2();
+            }
+          }
+     });
+
+    mniya.define("module2",["module3"],function(module3){
+      console.log("module2")
+          return {
+            sayHello2:function(){
+              alert("hello,word2");
+              module3.sayHello3();
+            }
+          }
+     });
+
+     mniya.define("module3",[],function(){
+      console.log("module3")
+          return {
+            sayHello3:function(){
+              alert("hello,word3");
+            }
+          }
+     });
+    
+    mniya.define("module4",[],{name:"module4"});
+    mniya.modules.module4.disable();
+    console.log( mniya.modules.module4);
+    mniya.modules.module4.enable();
+    mniya.openModule(["module1"]);
+    mniya.module1.sayHello();
+    
+    //模块扩充设想
+    // mniya.value("name","niuzhiheng");   
+    // mniya.factory("nameFactory",function nameFactory(){
+    //    return "niuzhiheng";
+    // });
+    // mniya.service("NameSerive",function NameSerive(){
+    //    this.name ="niuzhiheng";
+    // });
+
+   /**********工作流部分解决业务代码问题***************/
+   mniya.task("render",function(){
+       console.log("render");
+   });
+
+   mniya.task("bindEvent",function(){
+    console.log("bindEvent");
+    var service = mniya.services;
+    service.service1();
+   });
+  
+   mniya.service("service1",function(){
+           console.log("service");
+    });
+
+   /********切面部分*******************/
+  //切面例子
+   mniya.aspect("statTime",{
+      before:function(joinPoint){
+         this.startTime = new Date();
+         this.escape = 0;
+         // console.log("startTime:"+this.startTime.getTime());
+         console.log("before");
+      },
+      after:function(joinPoint){
+        this.endTime = new Date();
+        // console.log("endTime:"+this.endTime.getTime());
+        // this.escape = this.endTime - this.startTime;
+        // console.log(this.escape);
+         console.log("after");
+      },
+      throwing:function(joinPoint){
+        console.log("throwing:"+taskId+":"+err);
+      },
+      asyncAfter:function(taskId,args){
+        console.log("asyncAfter");
+      }
+   });
+
+   // 未来的设想
+   // mniya.pointCut("module(module1,module2,module3)","statTime");
+   // mniya.pointCut("service(*)","statTime");
+   // mniya.pointCut("task(*)","statTime");
+   
+
+   //运行工作流形式
+   //方式1
+   // mniya.workflow("ui-dialog",["render","bindEvent"]).run();
+   //方式2
+   // mniya.run("pageOrder");
+   // 方式3 带有切面的
+   mniya.pointCut("service1","statTime","service");
+   mniya.workflow("pageOrder",["render","bindEvent"]).pointCutTask(["render","bindEvent"],"statTime").run();
+   
+
+    // mniya.use(["module1","module3","module4"],function(module1,module3,module4){
+    //   module1.sayHello();
+    //   module3.sayHello3();
+    //   console.log(module4.name);
+    // });
+    eco.define("module",[],function(){
+      console.log("eco module")
+          return {
+            sayHello:function(){
+              alert("hello,eco module");
+            }
+          }
+     });
+    mniya.use(["module1","eco.module"],function(module1,module){
+          module1.sayHello();
+          module.sayHello();
+    });
+
+</script>
+</body>
+</html>

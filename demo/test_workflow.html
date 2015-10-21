@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>ecojs任务服务模型的业务工作流测试</title>
+      <!--引入核心框架库-->
+      <script src="../src/eco.js"></script>
+</head>
+<body>
+<h1>控制台查看</h1>
+<script type="text/javascript">
+
+   // 方式1 
+   eco.task("render",function(service){
+       console.log("render");
+   });
+
+   eco.task("bindEvent",function(service,task){
+    console.log("bindEvent");
+    service.service1();
+    task.submitOrder();
+   });
+   eco.task("submitOrder",function(service){
+        console.log("submitOrder");
+   })
+   eco.service("service1",function(){
+           console.log("service1");
+           this.service2();
+    });
+    eco.service("service2",function(){
+      console.log("service2");
+    });  
+   eco.workflow("indexPage",["render","bindEvent"]).run(); 
+
+   //方式2 
+    eco.service({
+      service1:function(){
+        console.log("service1");
+        this.service2();
+      },
+      service2:function(){
+        console.log("service2");
+      }
+    });
+    eco.task({
+        render:function(){
+          console.log("render");
+        },
+        bindEvent:function(service,task){
+          console.log("bindEvent");
+          service.service1();
+          task.submitOrder();
+        },
+        submitOrder:function(){
+        console.log("submitOrder");
+        }
+    });  
+   eco.workflow(["render","bindEvent"]).run(); 
+    
+
+
+</script>
+</body>
+</html>

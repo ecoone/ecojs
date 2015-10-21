@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>ecojs命名空间测试</title>
+      <script src="../src/eco.js"></script>
+</head>
+<body>
+<h1>控制台查看</h1>
+<script type="text/javascript">
+  //命名空间定义
+  eco.namespace("mniya");
+
+  //命名空间元数据
+  mniya.meta({
+    name:"mniya命名空间",
+    author:"niuzhiheng",
+    version:"0.0.1",
+    description:"...",
+    participator:"niuzhiheng"
+  });
+  console.log(mniya.meta());
+
+  //data,env方法的使用
+  mniya.data("api",{
+    base:"http://www.mniya.com",
+  });
+  console.log(mniya.data("api").base);  // http://www.mniya.com
+  
+  mniya.data("api.dev",{
+   base:"http://127.0.0.1"
+  });
+  mniya.data("api.prd",{
+   base:"http://www.mniya.com"
+  });
+  
+  console.log(mniya.data("api.dev").base); //http://127.0.0.1
+  console.log(mniya.data("api").base);  // http://www.mniya.com
+  
+  mniya.env("prd");
+  console.log(mniya.data("api").base);//http://www.mniya.com
+  
+  mniya.env("api.dev"); 
+  console.log(mniya.data("api.dev").base); //http://127.0.0.1
+  console.log(mniya.data("api").base);  //http://127.0.0.1
+  
+ //工具方法TODO
+</script>
+</body>
+</html>
