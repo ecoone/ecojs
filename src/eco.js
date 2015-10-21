@@ -558,7 +558,7 @@
         })(nameSpaceName);
       } else {
         if (!global[nameSpaceName]) {
-          throw Error("命名空间" + module.nameSpace.name + "中未找到要加载的命名空间:" + nameSpaceName + "的配置");
+          throw Error("命名空间" + module.nameSpace.name + "中未找到要加载的命名空间:" + nameSpaceName + "的配置且这个命名空间不存在");
         } else {
           global[nameSpaceName].status = 1;
         }
@@ -702,6 +702,7 @@
       return;
     }
 
+    //本命名空间必须加载
     //从dependencyIds中获取nameSpaceNames
     for (var i = 0; i < dependencyIds.length; i++) {
       var dependencyId = dependencyIds[i];
@@ -710,6 +711,7 @@
         if (!util.isInArray(nameSpaceNames, nameSpaceName)) nameSpaceNames.push(nameSpaceName);
       }
     }
+    if(!util.isInArray(nameSpaceNames, this.name)) nameSpaceNames.push(this.name);
 
     if (nameSpaceNames && nameSpaceNames.length > 0) {
       //加载命名空间
