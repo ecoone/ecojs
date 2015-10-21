@@ -1,1 +1,1075 @@
-!function(a,b){function e(a,b,c){2==arguments.length&&(b=[],c=b),this.id=a,this.dependencyIds=b,this.dependencies={},this.factory=c,this.status=d.CREATED,this.exports={},this._enable=!0,this.nameSpace=null}function f(a){this.name=a,this._data={_env:""},this._meta={name:"",version:"",description:"",author:"",participator:""},this.childNames=[],this.children={},this.parent=null,this.moduleIds=[],this.modules={},this.taskIds=[],this.tasks={},this.serviceIds=[],this.services={},this.aspectIds=[],this.aspects={},this.workflowIds=[],this.workflows={},this.configData={base:"/",nameSpaces:{},fullNameSpaces:{},modules:{},fullModules:{}},this.status=0}function j(a,b,c){this.context=a,this.id=b,this.sequenceTask=c,this.taskaspectIds={}}function k(a,b){return function(){this.id=a,this.advice=b}}function l(a,b,c,d,e,f){return function(){try{m({aspectObjs:b,adviceType:"before",returnVal:null,error:null,srcArgs:arguments,nameSpace:e,targetId:a,type:f,funcName:c});var g=d.call(this,arguments);m({aspectObjs:b,adviceType:"after",returnVal:g,error:null,srcArgs:arguments,nameSpace:e,targetId:a,type:f,funcName:c})}catch(h){m({aspectObjs:b,adviceType:"error",returnVal:null,error:h,srcArgs:arguments,nameSpace:e,targetId:a,type:f,funcName:c})}return g}}function m(a){var b,c;for(b=0;b<a.aspectObjs.length&&(c={stop:!1,srcArgs:a.srcArguments,targetId:a.targetId,type:a.type,nameSpace:a.nameSpace,error:a.error,funcName:a.funcName},a.aspectObjs[b].advice[a.adviceType]&&a.aspectObjs[b].advice[a.adviceType](c),!c.stop);b++);}var c,d,g,h;a.eco||(c={},c.isType=function(a){return function(b){return{}.toString.call(b)=="[object "+a+"]"}},c.isObject=c.isType("Object"),c.isString=c.isType("String"),c.isArray=Array.isArray||c.isType("Array"),c.isFunction=c.isType("Function"),c.isUndefined=c.isType("Undefined"),c.isInArray=function(a,b){for(i=0;i<a.length;i++)if(a[i]==b)return!0;return!1},c._uid=0,c.uid=function(){return c._uid++},function(a){function j(h,j,l,m){var n,o,q;if(l="utf-8",m=b,n=g.test(h),!n&&c){try{importScripts(h)}catch(p){o=p}return j(o),void 0}q=d.createElement(n?"link":"script"),l&&(q.charset=l),a.isUndefined(m)||q.setAttribute("crossorigin",m),k(q,j,n,h),n?(q.rel="stylesheet",q.href=h):(q.async=!0,q.src=h),i=q,f?e.insertBefore(q,f):e.appendChild(q),i=null}function k(b,c,d,f){function i(a){b.onload=b.onerror=b.onreadystatechange=null,b.rel||e.removeChild(b),b=null,c(a)}var g="onload"in b;return!d||!h&&g?(g?(b.onload=i,b.onerror=function(){a.emit("error",{uri:f,node:b}),i(!0)}):b.onreadystatechange=function(){/loaded|complete/.test(b.readyState)&&i()},void 0):(setTimeout(function(){l(b,c)},1),void 0)}function l(a,b){var d,c=a.sheet;if(h)c&&(d=!0);else if(c)try{c.cssRules&&(d=!0)}catch(e){"NS_ERROR_DOM_SECURITY_ERR"===e.name&&(d=!0)}setTimeout(function(){d?b():l(a,b)},20)}var i,c="undefined"==typeof window&&"undefined"!=typeof importScripts&&isFunction(importScripts),d=document,e=d.head||d.getElementsByTagName("head")[0]||d.documentElement,f=e.getElementsByTagName("base")[0],g=/\.css(?:\?|$)/i,h=+navigator.userAgent.replace(/.*(?:AppleWebKit|AndroidWebKit)\/?(\d+).*/i,"$1")<536;a.request=j}(c),c.extend=function(a,b,d){var e;if(!b)return a;for(e in b)a!==b[e]&&(c.isObject(b[e])&&d&&(a[e]||(a[e]={}),c.extend(a[e],b[e],d)),a[e]=b[e]);return a},c.events={},c.on=function(a,b){var d=c.events[a]||(c.events[a]=[]);return d.push(b),c},c.one=function(a,b){var d=this,e=function(c){d.off(a,e),b.call(d,c)};return d.on(a,e),c},c.off=function(a,b){var d,e;if(!a&&!b)return c.events={},c;if(d=c.events[a])if(b)for(e=d.length-1;e>=0;e--)d[e]===b&&d.splice(e,1);else delete c.events[a];return c},c.emit=function(a,b){var e,f,d=c.events[a];if(d)for(d=d.slice(),e=0,f=d.length;f>e;e++)d[e](b);return c},d=e.STATUS={VIRTUAL:-1,CREATED:0,READY:1,EXECUTING:2,EXECUTED:3},e.prototype.exec=function(){var a,b;if(!this._enable)throw new Error("模块"+this.id+"处于不可用的状态");if(this.status>=d.EXECUTING)return this.exports;for(this.status=d.EXECUTING,a=[],b=0;b<this.dependencyIds.length;b++)a.push(this.dependencies[this.dependencyIds[b]].exec());return this.exports=c.isFunction(this.factory)?this.factory.apply(this,a):this.factory,this.status=d.EXECUTED,this.exports},e.prototype.setDependencies=function(){var a,b,c;if(this.dependencyIds)for(a=0;a<this.dependencyIds.length;a++)b=this.dependencyIds[a],c=this.nameSpace.searchModuleById(b),c.setDependencies(),this.dependencies[b]=c},e.prototype.disable=function(){this._enable=!1},e.prototype.enable=function(){this._enable=!0},e.prototype.isEnable=function(){return this._enable},f.prototype.util=c,f.prototype.namespace=function(b,c){a[b]||(a[b]=new f(b),a[b].parent=this,this.childNames.push(b),this.children[b]=a[b]),c&&c(a[b])},f.prototype.data=function(a,b){var d=arguments.length,e=null,f=a,g="";return-1!=a.indexOf(".")&&(f=a.split(".")[0],g=a.split(".")[1]),1==d&&(this._data._env&&!g&&(g=this._data._env),g?(c.isObject(this._data[f][g])&&(e={},c.extend(e,this._data[f]._global),c.extend(e,this._data[f][g])),e=this._data[f][g]):e=this._data[f]._global),2==d&&(this._data[f]||(this._data[f]={_global:{}},g||(this._data[f]._global=b)),c.isObject(b)?(c.isObject(this._data[f]._global)||(this._data[f]._global={}),c.isObject(this._data[f][g])||(this._data[f][g]={}),g?c.extend(this._data[f][g],b):c.extend(this._data[f]._global,b)):g?this._data[f][g]=b:this._data[f]._global=b,e=this),e},f.prototype.env=function(a){var b=a,c="";return-1!=a.indexOf(".")&&(c=a.split(".")[0],b=a.split(".")[1]),this._data._env=b,c&&(this._data[c]._env=b),this},f.prototype.meta=function(a){return a?(c.extend(this._meta,a),void 0):this._meta},f.prototype.searchModuleById=function(b){var e,f,g,c=this.modules[b];if(-1!=b.indexOf(".")){if(e=b.split(".")[0],b=b.split(".")[1],f=a[e],!f)throw Error("模块："+b+",所在的命名空间："+e+"不存在");c=f.searchModuleById(b)}else if(!c)if(g=this.configData.modules[b]?this.configData.base+this.configData.modules[b]:this.configData.fullModules[b])c={url:g,id:b,nameSpace:this,status:d.VIRTUAL};else{if(!this.parent)throw Error("模块："+b+",在命名空间树中未查询到");c=this.parent.searchModuleById(b)}return c},f.prototype.getUrlByNameSpaceName=function(a){var b=this.configData.nameSpaces[a]?this.configData.base+this.configData.nameSpaces[a]:this.configData.fullNameSpaces[a];if(!b){if(!this.parent)throw Error("没有发现命名空间"+a+",在资源配置表中。");b=this.parent.getUrlByNameSpaceName(a)}return b},g={ERROR:-1,INIT:0,FETCHING:1,FETCHED:2},h={},f.prototype.loadNameSpaces=function(b,d){function k(){var g,h,f=!0;for(g=0;g<b.length;g++)if(h=b[g],!a[h]||0==a[h].status){f=!1;break}f&&(c.off("nameSpaceReady",k),d.call(e))}var f,i,j,e=this;for(f=0;f<b.length;f++)if(i=b[f],j=this.getUrlByNameSpaceName(i),j&&(!h[j]||h[j]<g.FETCHING))!function(b){h[j]=g.FETCHING,c.request(j,function(d){if(d===!0)throw h[j]=g.ERROR,Error("命名空间"+module.nameSpace.name+"中加载命名空间:"+b+",发生错误："+d);h[j]=g.FETCHED,a[b].status=1,c.emit("nameSpaceReady")})}(i);else{if(!a[i])throw Error("命名空间"+module.nameSpace.name+"中未找到要加载的命名空间:"+i+"的配置");a[i].status=1}c.on("nameSpaceReady",k),k()},f.prototype.loadModules=function(a,b){function l(){var f,g,h,i;if(!l.locked){for(f=!0,g=0;g<a.length;g++)if(h=a[g],i=e.searchModuleById(h),i.status<=d.CREATED){f=!1;break}f&&(l.locked=!0,c.off("moduleReady",l),b.call(e))}}var f,i,j,k,e=this;for(f=0;f<a.length;f++)i=a[f],j=this.searchModuleById(i),k=j.url,k&&(!h[k]||h[k]<g.FETCHING)&&function(a){var b=a.url;h[b]=g.FETCHING,c.request(b,function(d){if(d===!0)throw h[b]=g.ERROR,Error("命名空间"+a.nameSpace.name+"中加载模块:"+a.id+",发生错误："+d);h[b]=g.FETCHED,-1!=b.indexOf(".css")?a.nameSpace.define(i,[],function(){}):c.emit("loadDependencies")})}(j);l.locked=!1,c.on("moduleReady",l),l()},f.prototype.config=function(a){c.extend(this.configData,a)},f.prototype.define=function(a,b,f){var g,h;return 2==arguments.length&&(f=b,b=[]),g=this,h=new e(a,b,f),h.nameSpace=this,this.moduleIds.push(a),this.modules[a]=h,0==b.length?(h.status=d.READY,c.emit("moduleReady")):c.one("loadDependencies",function(){g.loadModules(b,function(){h.status=d.READY,c.emit("moduleReady")})}),this},f.prototype.use=function(a,b,d){function j(){var e,f,g,a=this,c=[];for(e=0;e<b.length;e++)f=a.searchModuleById(b[e]),f.setDependencies(),g=f.exec(),c.push(g);d.apply(a,c)}var e,f,g,h,i;if(c.isString(a)&&(a=[a]),3==arguments.length&&c.isString(b)&&(b=[b]),2==arguments.length&&(d=b,b=a,a=[]),1!=arguments.length){for(e=0;e<b.length;e++)h=b[e],-1!=h.indexOf(".")&&(i=h.split(".")[0],c.isInArray(a,i)||a.push(i));a&&a.length>0?this.loadNameSpaces(a,function(){c.emit("loadDependencies"),this.loadModules(b,j)}):(c.emit("loadDependencies"),this.loadModules(b,j))}else for(c.emit("loadDependencies"),b=a,a=[],d=function(){},e=0;e<b.length;e++){if(f=b[e],-1!=f.indexOf("."))throw Error("同步模式不得夸命名空间调用");g=this.searchModuleById(f),g.setDependencies(),this[f]=g.exec()}},f.prototype.showNameSpaceTree=function(){var d,a=this,b=a.childNames.join(","),c="";for(b&&(c="("+b+")"),console.log(a.name+c),console.log("----"),d=0;d<a.childNames.length;d++)a.children[b].showNameSpaceTree()},f.prototype.showModules=function(){console.log("该命名空间模块总数是:"+this.moduleIds.length),console.log("该命名空间下的模块有:"+this.moduleIds.join(","))},f.prototype.showModulesTree=function(){for(var a=0;a<this.moduleIds.length;a++)this.showModuleTree(this.moduleIds[a]),console.log("---------------")},f.prototype.showModuleTree=function(a){var e,b=this.modules[a],c=b.dependencyIds.join(","),d="";for(c&&(d="("+c+")"),console.log(b.id+d),console.log("----"),e=0;e<b.dependencyIds.length;e++)this.showModuleTree(b.dependencyIds[e])},f.prototype.task=function(a,b){if(c.isObject(a))for(var d in a)this.taskIds.push(d),this.tasks[d]=a[d];else this.taskIds.push(a),this.tasks[a]=b;return this},f.prototype.service=function(a,b){if(c.isObject(a))for(var d in a)this.serviceIds.push(d),this.services[d]=a[d];else this.serviceIds.push(a),this.services[a]=b;return this},j.prototype.run=function(){var c,d,a=this.sequenceTask,b=this.context;for(c=0;c<a.length;c++)d=a[c],b.tasks[d].call(b,b.services,b.tasks)},f.prototype.run=function(a){this.workflows[a].run()},f.prototype.workflow=function(a,b){return 1==arguments.length&&c.isArray(a)&&(b=a,a="_anonymous_workflow_"+c.uid()),2==arguments.length&&c.isString(b)&&(b=[b]),this.workflowIds.push(a),this.workflows[a]=new j(this,a,b),this.workflows[a]},f.prototype.aspect=function(a,b){return this.aspectIds.push(a),this.aspects[a]=new k(a,b),this},f.prototype.pointCutTask=function(a,b){arguments.length;var e=this.taskIds;return 1==arguments.length&&(b=a,a=e),c.isString(b)&&(b=[b]),this.pointCut(a,b,"task"),this},f.prototype.pointCutService=function(a,b){arguments.length;var e=this.serviceIds;return 1==arguments.length&&(b=a,a=e),c.isString(b)&&(b=[b]),this.pointCut(a,b,"service"),this},f.prototype.pointCutModule=function(a,b){arguments.length;var e=this.moduleIds;return 1==arguments.length&&(b=a,a=e),c.isString(b)&&(b=[b]),this.pointCut(a,b,"module"),this},f.prototype.pointCutModule=function(a,b){arguments.length;var e=this.moduleIds;return 1==arguments.length&&(b=targetmoduleIds,targetmoduleIds=e),c.isString(b)&&(b=[b]),this.pointCut(targetmoduleIds,b,"moduleFactory"),this},f.prototype.pointCut=function(a,b,d){var f,h,i,j,k,m,n,o;for(c.isString(a)&&(a=[a]),c.isString(b)&&(b=[b]),arguments.length,a=[],f=[],"task"==d&&(a=this.taskIds,f=this.tasks),"service"==d&&(a=this.serviceIds,f=this.services),("module"==d||"moduleFactory"==d)&&(a=this.moduleIds,f=this.modules),h=0;h<a.length;h++){for(i=a[h],j=f[i],k=[],m=0;m<b.length;m++)k.push(new this.aspects[b[m]]);if(c.isObject(j))if("moduleFactory"==d)j.factory=l(i,k,"factory",j.factory);else if("module"==d){if(j.exec(),n=j.exports,c.isFunction(n)&&(j.exports=l(i,k,"exports",n)),c.isObject(n))for(o in n)c.isFunction(n[o])&&(n[o]=l(i,k,o,n[o]))}else for(o in j)c.isFunction(j[o])&&(j[o]=l(i,k,o,j[o]));c.isFunction(j)&&(f[i]=l(i,k,i,j))}return this},j.prototype.pointCutTask=function(a,b){return 1==arguments.length&&(b=a,a=this.sequenceTask),this.context.pointCutTask(a,b),this},a.eco=new f("eco"))}(this);
+/**
+ * eco.js 
+ * 生态前端平台
+ */
+(function(global, undefined) {
+  if (global.eco) {
+    return;
+  }
+  /********公有方法部分**************************/
+  var util = {};
+
+  //类型判断
+  util.isType = function(type) {
+    return function(obj) {
+      return {}.toString.call(obj) == "[object " + type + "]"
+    }
+  }
+  util.isObject = util.isType("Object");
+  util.isString = util.isType("String");
+  util.isArray = Array.isArray || util.isType("Array");
+  util.isFunction = util.isType("Function");
+  util.isUndefined = util.isType("Undefined");
+  util.isInArray = function(array, item) {
+    for (i = 0; i < array.length; i++) {
+      if (array[i] == item)
+        return true;
+    }
+    return false;
+  }
+  util._uid = 0;
+  util.uid = function() {
+    return util._uid++
+  };
+
+  //css,js加载
+  (function(util) {
+    var isWebWorker = typeof window === 'undefined' && typeof importScripts !== 'undefined' && isFunction(importScripts);
+    var doc = document
+    var head = doc.head || doc.getElementsByTagName("head")[0] || doc.documentElement
+    var baseElement = head.getElementsByTagName("base")[0]
+    var IS_CSS_RE = /\.css(?:\?|$)/i
+    var isOldWebKit = +navigator.userAgent
+      .replace(/.*(?:AppleWebKit|AndroidWebKit)\/?(\d+).*/i, "$1") < 536
+    var currentlyAddingScript
+
+    function request(url, callback, charset, crossorigin) {
+      charset = "utf-8";
+      crossorigin = undefined;
+      var isCSS = IS_CSS_RE.test(url);
+      if (!isCSS && isWebWorker) {
+        var error
+        try {
+          importScripts(url)
+        } catch (e) {
+          error = e
+        }
+        callback(error)
+        return;
+      }
+      var node = doc.createElement(isCSS ? "link" : "script");
+      if (charset) {
+        node.charset = charset
+      }
+
+      if (!util.isUndefined(crossorigin)) {
+        node.setAttribute("crossorigin", crossorigin)
+      }
+
+      addOnload(node, callback, isCSS, url)
+
+
+      if (isCSS) {
+        node.rel = "stylesheet"
+        node.href = url
+      } else {
+        node.async = true
+        node.src = url
+      }
+
+      // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
+      // the end of the insert execution, so use `currentlyAddingScript` to
+      // hold current node, for deriving url in `define` call
+      currentlyAddingScript = node
+
+      // ref: #185 & http://dev.jquery.com/ticket/2709
+      baseElement ?
+        head.insertBefore(node, baseElement) :
+        head.appendChild(node)
+
+      currentlyAddingScript = null
+    }
+
+    function addOnload(node, callback, isCSS, url) {
+      var supportOnload = "onload" in node
+
+      // for Old WebKit and Old Firefox
+      if (isCSS && (isOldWebKit || !supportOnload)) {
+        setTimeout(function() {
+            pollCss(node, callback)
+          }, 1) // Begin after node insertion
+        return
+      }
+
+      if (supportOnload) {
+        node.onload = onload
+        node.onerror = function() {
+          util.emit("error", {
+            uri: url,
+            node: node
+          })
+          onload(true)
+        }
+      } else {
+        node.onreadystatechange = function() {
+          if (/loaded|complete/.test(node.readyState)) {
+            onload()
+          }
+        }
+      }
+
+      function onload(error) {
+        // Ensure only run once and handle memory leak in IE
+        node.onload = node.onerror = node.onreadystatechange = null
+
+        // Remove the script to reduce memory leak
+        if (!node.rel) {
+          head.removeChild(node)
+        }
+
+        // Dereference the node
+        node = null
+
+        callback(error)
+      }
+    }
+
+    function pollCss(node, callback) {
+      var sheet = node.sheet
+      var isLoaded
+
+      // for WebKit < 536
+      if (isOldWebKit) {
+        if (sheet) {
+          isLoaded = true
+        }
+      }
+      // for Firefox < 9.0
+      else if (sheet) {
+        try {
+          if (sheet.cssRules) {
+            isLoaded = true
+          }
+        } catch (ex) {
+          // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
+          // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
+          // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
+          if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
+            isLoaded = true
+          }
+        }
+      }
+
+      setTimeout(function() {
+        if (isLoaded) {
+          // Place callback here to give time for style rendering
+          callback()
+        } else {
+          pollCss(node, callback)
+        }
+      }, 20)
+    }
+    util.request = request
+  })(util);
+
+  //对象扩充
+  util.extend = function(target, obj, deep) {
+    var key;
+    if (!obj) return target;
+
+    for (key in obj) {
+      if (target === obj[key]) continue;
+      if (util.isObject(obj[key]) && deep) {
+        if (!target[key]) target[key] = {};
+        util.extend(target[key], obj[key], deep);
+      }
+      target[key] = obj[key];
+    }
+    return target;
+  };
+
+  //事件通讯
+  util.events = {};
+  util.on = function(name, callback) {
+    var list = util.events[name] || (util.events[name] = [])
+    list.push(callback)
+    return util
+  }
+
+  util.one = function(name, callback) {
+    var self = this;
+    var oneHandler = function(data) {
+      self.off(name, oneHandler);
+      callback.call(self, data);
+    };
+    self.on(name, oneHandler);
+    return util
+  }
+
+  util.off = function(name, callback) {
+    if (!(name || callback)) {
+      util.events = {}
+      return util
+    }
+
+    var list = util.events[name]
+    if (list) {
+      if (callback) {
+        for (var i = list.length - 1; i >= 0; i--) {
+          if (list[i] === callback) {
+            list.splice(i, 1)
+          }
+        }
+      } else {
+        delete util.events[name]
+      }
+    }
+
+    return util
+  }
+
+  util.emit = function(name, data) {
+    var list = util.events[name]
+
+    if (list) {
+      list = list.slice()
+
+      for (var i = 0, len = list.length; i < len; i++) {
+        list[i](data)
+      }
+    }
+
+    return util
+  }
+
+  /*****************模块部分************************/
+
+  //模块状态
+  var STATUS = Module.STATUS = {
+    VIRTUAL: -1, //这个模块不是真实的，只是一个虚拟模块
+    CREATED: 0, //模块所在文件加载完成
+    READY: 1, //模块的依赖文件加载完成
+    EXECUTING: 2, //执行模块中
+    EXECUTED: 3, //执行成功
+  }
+
+  //模块类
+  function Module(id, dependencyIds, factory) {
+    if (arguments.length == 2) {
+      dependencyIds = [];
+      factory = dependencyIds;
+    }
+    //模块标识
+    this.id = id;
+    //依赖模块标识
+    this.dependencyIds = dependencyIds;
+    //依赖模块对象
+    this.dependencies = {};
+    //模块构造方法
+    this.factory = factory;
+    //模块的状态
+    this.status = STATUS.CREATED;
+    //模块导出
+    this.exports = {};
+    //模块是否可用
+    this._enable = true;
+    //模块关联的命名空间
+    this.nameSpace = null;
+  }
+
+  //执行模块
+  Module.prototype.exec = function() {
+    //如果模块处于不可用状态报错
+    if (!this._enable) {
+      throw new Error('模块' + this.id + '处于不可用的状态');
+    }
+
+    //模块的状态若大于开始执行那么
+    if (this.status >= STATUS.EXECUTING) {
+      return this.exports;
+    }
+
+    this.status = STATUS.EXECUTING;
+
+    var exportsList = [];
+    for (var i = 0; i < this.dependencyIds.length; i++) {
+      exportsList.push(this.dependencies[this.dependencyIds[i]].exec());
+    }
+
+    this.exports = util.isFunction(this.factory) ? this.factory.apply(this, exportsList) : this.factory;
+
+    this.status = STATUS.EXECUTED;
+    return this.exports;
+  }
+
+  //设置模块的依赖
+  Module.prototype.setDependencies = function() {
+    if (this.dependencyIds) {
+      for (var i = 0; i < this.dependencyIds.length; i++) {
+        var id = this.dependencyIds[i];
+        var dependModule = this.nameSpace.searchModuleById(id);
+        dependModule.setDependencies();
+        this.dependencies[id] = dependModule;
+      }
+    }
+  }
+
+  //模块不可用
+  Module.prototype.disable = function() {
+    this._enable = false;
+  }
+
+  //模块可用
+  Module.prototype.enable = function() {
+    this._enable = true;
+  }
+
+  //模块是否可用
+  Module.prototype.isEnable = function() {
+    return this._enable;
+  }
+
+  /*********命名空间部分***********************/
+  function NameSpace(name) {
+    //命名空间的名字
+    this.name = name;
+
+    this._data = {
+      _env: "" //环境变量               
+    };
+
+    this._meta = {
+      name: "", //名称
+      version: "", //版本号
+      description: "", //描述
+      author: "", //作者
+      participator: "" //参与者
+    };
+
+    //子命名空间标识集合
+    this.childNames = [];
+    //子命名空间引用
+    this.children = {};
+
+    //父命名空间
+    this.parent = null;
+
+    //命名空间下的模块标识集合
+    this.moduleIds = [];
+    //命名空间下的模块对象
+    this.modules = {};
+
+    //任务相关
+    this.taskIds = [];
+    this.tasks = {};
+
+    //服务相关
+    this.serviceIds = [];
+    this.services = {};
+
+    //切面相关
+    this.aspectIds = [];
+    this.aspects = {};
+
+    //工作流相关
+    this.workflowIds = [];
+    this.workflows = {};
+
+    //配置路径
+    this.configData = {
+      base: "/",
+      nameSpaces: {},
+      fullNameSpaces: {},
+      modules: {},
+      fullModules: {}
+    }
+
+    //是否处于完备状态,0不是，1是 
+    this.status = 0;
+  }
+
+  //util扩充给NameSpace
+  NameSpace.prototype.util = util;
+
+  //命名空间生成新的命名空间,双向链
+  NameSpace.prototype.namespace = function(name, callback) {
+    if (!global[name]) {
+      global[name] = new NameSpace(name);
+      global[name].parent = this;
+      this.childNames.push(name);
+      this.children[name] = global[name];
+    }
+    if (callback) callback(global[name]);
+  };
+
+  //设置公有资源配置
+  NameSpace.prototype.data = function(keyAndEnv, data) {
+    var argLen = arguments.length;
+    var returnData = null;
+    var key = keyAndEnv,
+      env = "";
+    if (keyAndEnv.indexOf(".") != -1) {
+      key = keyAndEnv.split(".")[0];
+      env = keyAndEnv.split(".")[1];
+    }
+    //获取数据
+    if (argLen == 1) {
+      if (this._data._env && !env) {
+        env = this._data._env;
+      }
+      if (env) {
+        if (util.isObject(this._data[key][env])) {
+          returnData = {};
+          util.extend(returnData, this._data[key]._global);
+          util.extend(returnData, this._data[key][env]);
+        }
+        returnData = this._data[key][env];
+      } else {
+        returnData = this._data[key]._global;
+      }
+
+    }
+    //3.设置特定环境变量下的公有配置
+    if (argLen == 2) {
+      if (!this._data[key]) {
+        this._data[key] = {
+          _global: {}
+        };
+        if (!env) {
+          this._data[key]._global = data;
+        }
+      }
+      if (util.isObject(data)) {
+
+        if (!util.isObject(this._data[key]._global)) this._data[key]._global = {};
+        if (!util.isObject(this._data[key][env])) this._data[key][env] = {};
+        if (env) {
+          util.extend(this._data[key][env], data);
+        } else {
+          util.extend(this._data[key]._global, data);
+        }
+      } else {
+        if (env) {
+          this._data[key][env] = data;
+        } else {
+          this._data[key]._global = data;
+        }
+      }
+      returnData = this;
+    }
+
+    return returnData;
+  }
+
+  //设置环境变量
+  NameSpace.prototype.env = function(envAndKey) {
+    var env = envAndKey,
+      key = "";
+    if (envAndKey.indexOf(".") != -1) {
+      key = envAndKey.split(".")[0];
+      env = envAndKey.split(".")[1];
+    }
+    this._data._env = env;
+    if (key) {
+      this._data[key]._env = env
+    }
+    return this;
+  }
+
+  //设置获取命名空间的元数据
+  NameSpace.prototype.meta = function(obj) {
+    if (!obj) return this._meta;
+    util.extend(this._meta, obj);
+  }
+
+  //根据模块id查询模块
+  NameSpace.prototype.searchModuleById = function(moduleId) {
+    var module = this.modules[moduleId];
+    if (moduleId.indexOf(".") != -1) {
+      var nameSpaceName = moduleId.split(".")[0];
+      var moduleId = moduleId.split(".")[1];
+      var nameSpace = global[nameSpaceName];
+      if (!nameSpace) {
+        throw Error("模块：" + moduleId + ",所在的命名空间：" + nameSpaceName + "不存在");
+      } else {
+        module = nameSpace.searchModuleById(moduleId);
+      }
+    } else {
+      if (!module) {
+        var url = this.configData.modules[moduleId] ? (this.configData.base + this.configData.modules[moduleId]) : this.configData.fullModules[moduleId];
+        if (url) {
+          module = { //虚拟模块
+            url: url,
+            id: moduleId,
+            nameSpace: this,
+            status: STATUS.VIRTUAL
+          };
+        } else {
+          if (!this.parent) {
+            throw Error("模块：" + moduleId + ",在命名空间树中未查询到");
+          } else {
+            module = this.parent.searchModuleById(moduleId);
+          }
+        }
+      }
+    }
+    return module;
+  }
+
+  //根据命名空间名称获取url
+  NameSpace.prototype.getUrlByNameSpaceName = function(nameSpaceName) {
+    var url = this.configData.nameSpaces[nameSpaceName] ? (this.configData.base + this.configData.nameSpaces[nameSpaceName]) : this.configData.fullNameSpaces[nameSpaceName];
+    if (!url) {
+      if (!this.parent) {
+        throw Error("没有发现命名空间" + nameSpaceName + ",在资源配置表中。");
+      } else {
+        url = this.parent.getUrlByNameSpaceName(nameSpaceName);
+      }
+    }
+    return url;
+  }
+
+  //链接资源的状态
+  var URL_STATUS = {
+    ERROR: -1,
+    INIT: 0,
+    FETCHING: 1,
+    FETCHED: 2
+  };
+  var urlStatusMap = {};
+
+  NameSpace.prototype.loadNameSpaces = function(nameSpaceNames, callback) {
+    var nameSpace = this;
+    for (var i = 0; i < nameSpaceNames.length; i++) {
+      var nameSpaceName = nameSpaceNames[i];
+      var url = this.getUrlByNameSpaceName(nameSpaceName);
+      if (url && (!urlStatusMap[url] || urlStatusMap[url] < URL_STATUS.FETCHING)) {
+        (function(nameSpaceName) {
+          urlStatusMap[url] = URL_STATUS.FETCHING;
+          util.request(url, function(error) {
+            if (error === true) {
+              urlStatusMap[url] = URL_STATUS.ERROR;
+              throw Error("命名空间" + module.nameSpace.name + "中加载命名空间:" + nameSpaceName + ",发生错误：" + error);
+            }
+            urlStatusMap[url] = URL_STATUS.FETCHED;
+            global[nameSpaceName].status = 1;
+            util.emit("nameSpaceReady");
+          });
+        })(nameSpaceName);
+      } else {
+        if (!global[nameSpaceName]) {
+          throw Error("命名空间" + module.nameSpace.name + "中未找到要加载的命名空间:" + nameSpaceName + "的配置");
+        } else {
+          global[nameSpaceName].status = 1;
+        }
+      }
+    }
+
+    function nameSpaceReadyCallback() {
+      var ready = true;
+      for (var i = 0; i < nameSpaceNames.length; i++) {
+        var nameSpaceName = nameSpaceNames[i];
+        if (!global[nameSpaceName] || (global[nameSpaceName].status == 0)) {
+          ready = false;
+          break;
+        }
+      }
+      if (ready) {
+        util.off("nameSpaceReady", nameSpaceReadyCallback);
+        callback.call(nameSpace);
+      }
+    }
+    util.on("nameSpaceReady", nameSpaceReadyCallback);
+    nameSpaceReadyCallback();
+  }
+
+  NameSpace.prototype.loadModules = function(moduleIds, callback) {
+    var nameSpace = this;
+    for (var i = 0; i < moduleIds.length; i++) {
+      var moduleId = moduleIds[i];
+      var module = this.searchModuleById(moduleId);
+      //去加载模块文件
+      var url = module.url;
+      if (url && (!urlStatusMap[url] || urlStatusMap[url] < URL_STATUS.FETCHING)) {
+        (function(module) {
+          var url = module.url;
+          urlStatusMap[url] = URL_STATUS.FETCHING;
+          util.request(url, function(error) {
+            if (error === true) {
+              urlStatusMap[url] = URL_STATUS.ERROR;
+              throw Error("命名空间" + module.nameSpace.name + "中加载模块:" + module.id + ",发生错误：" + error);
+            }
+            urlStatusMap[url] = URL_STATUS.FETCHED;
+            if (url.indexOf(".css") != -1) {
+              module.nameSpace.define(moduleId, [], function() {});
+            } else {
+              util.emit("loadDependencies");
+            }
+          });
+        })(module);
+      }
+    }
+
+    function moduleReadyCallback() {
+      if (moduleReadyCallback.locked) {
+        return;
+      }
+      var ready = true;
+      for (var i = 0; i < moduleIds.length; i++) {
+        var moduleId = moduleIds[i];
+        var module = nameSpace.searchModuleById(moduleId);
+        if (module.status <= STATUS.CREATED) {
+          ready = false;
+          break;
+        }
+      }
+      if (ready) {
+        moduleReadyCallback.locked = true;
+        util.off("moduleReady", moduleReadyCallback);
+        callback.call(nameSpace); //模块加载完成里面可能导致模块m加载完成出发循环依赖，所以这样要对函数加锁
+
+      }
+    }
+    moduleReadyCallback.locked = false;
+    util.on("moduleReady", moduleReadyCallback);
+    moduleReadyCallback();
+  }
+
+  //配置模块地址
+  NameSpace.prototype.config = function(configData) {
+    util.extend(this.configData, configData);
+  }
+
+  //创建一个模块
+  NameSpace.prototype.define = function(id, dependencyIds, factory) {
+    if (arguments.length == 2) {
+      factory = dependencyIds;
+      dependencyIds = [];
+    }
+    var nameSpace = this;
+    var module = new Module(id, dependencyIds, factory);
+    module.nameSpace = this;
+    this.moduleIds.push(id);
+    this.modules[id] = module;
+    if (dependencyIds.length == 0) { //没有依赖的情况下module的状态直接到Ready
+      module.status = STATUS.READY;
+      util.emit("moduleReady");
+    } else {
+      util.one("loadDependencies", function() { //存在依赖的需要等待有人发出加载依赖是时候在去加载
+        nameSpace.loadModules(dependencyIds, function() {
+          module.status = STATUS.READY;
+          util.emit("moduleReady");
+        })
+      });
+    }
+    return this;
+  }
+
+  //使用模块
+  NameSpace.prototype.use = function(nameSpaceNames, dependencyIds, factory) {
+    if (util.isString(nameSpaceNames)) {
+      nameSpaceNames = [nameSpaceNames]
+    };
+    if (arguments.length == 3) {
+      if (util.isString(dependencyIds)) {
+        dependencyIds = [dependencyIds]
+      };
+    }
+    if (arguments.length == 2) {
+      factory = dependencyIds;
+      dependencyIds = nameSpaceNames;
+      nameSpaceNames = [];
+    }
+
+
+    //同步模块引入
+    if (arguments.length == 1) {
+      //触发加载依赖，让现在存在的模块去加载依赖
+      util.emit("loadDependencies");
+
+      dependencyIds = nameSpaceNames;
+      nameSpaceNames = [];
+      factory = function() {};
+      for (var i = 0; i < dependencyIds.length; i++) {
+        var moduleId = dependencyIds[i];
+        if (moduleId.indexOf(".") != -1) {
+          throw Error("同步模式不得夸命名空间调用")
+        };
+        var module = this.searchModuleById(moduleId);
+        module.setDependencies();
+        this[moduleId] = module.exec();
+      }
+      return;
+    }
+
+    //从dependencyIds中获取nameSpaceNames
+    for (var i = 0; i < dependencyIds.length; i++) {
+      var dependencyId = dependencyIds[i];
+      if (dependencyId.indexOf(".") != -1) {
+        var nameSpaceName = dependencyId.split(".")[0];
+        if (!util.isInArray(nameSpaceNames, nameSpaceName)) nameSpaceNames.push(nameSpaceName);
+      }
+    }
+
+    if (nameSpaceNames && nameSpaceNames.length > 0) {
+      //加载命名空间
+      this.loadNameSpaces(nameSpaceNames, function() {
+        util.emit("loadDependencies");
+        this.loadModules(dependencyIds, loadModulesCallBack);
+      });
+    } else {
+      //加载模块
+      util.emit("loadDependencies");
+      this.loadModules(dependencyIds, loadModulesCallBack);
+    }
+
+    function loadModulesCallBack() {
+      //3.给module添加依赖对象,并执行模块
+      var nameSpace = this;
+      var exportsList = [];
+      for (var i = 0; i < dependencyIds.length; i++) {
+        var module = nameSpace.searchModuleById(dependencyIds[i]);
+        module.setDependencies();
+        var exports = module.exec();
+        exportsList.push(exports);
+      }
+      //4.调用
+      factory.apply(nameSpace, exportsList);
+    }
+  };
+
+
+  /*************获取命名空间，模块相关信息部分******************/
+  //命名空间依赖关系树  
+  NameSpace.prototype.showNameSpaceTree = function() {
+    var ns = this;
+    var childNames = ns.childNames.join(",");
+    var childrenInfo = "";
+    if (childNames) childrenInfo = "(" + childNames + ")";
+    console.log(ns.name + childrenInfo);
+    console.log("----");
+    for (var i = 0; i < ns.childNames.length; i++) {
+      ns.children[childNames].showNameSpaceTree();
+    }
+  }
+
+  //获取命名空间下的模块id 
+  NameSpace.prototype.showModules = function() {
+    console.log("该命名空间模块总数是:" + this.moduleIds.length);
+    console.log("该命名空间下的模块有:" + this.moduleIds.join(","));
+  }
+
+  //获取命名空间下的模块关系 
+  NameSpace.prototype.showModulesTree = function() {
+    for (var i = 0; i < this.moduleIds.length; i++) {
+      this.showModuleTree(this.moduleIds[i]);
+      console.log("---------------");
+    }
+  }
+
+  //获取某个模块的依赖关系 
+  NameSpace.prototype.showModuleTree = function(id) {
+    var module = this.modules[id];
+    var dependencyIds = module.dependencyIds.join(",");
+    var dependenciesInfo = "";
+    if (dependencyIds) dependenciesInfo = "(" + dependencyIds + ")";
+    console.log(module.id + dependenciesInfo);
+    console.log("----");
+    for (var i = 0; i < module.dependencyIds.length; i++) {
+      this.showModuleTree(module.dependencyIds[i]);
+    }
+  }
+
+  /***********工作流模块******************/
+  //任务管理
+  NameSpace.prototype.task = function(id, taskImpl) {
+    if (util.isObject(id)) {
+      for (var p in id) {
+        this.taskIds.push(p);
+        this.tasks[p] = id[p];
+      }
+    } else {
+      this.taskIds.push(id);
+      this.tasks[id] = taskImpl;
+    }
+    return this;
+  }
+
+  //服务管理
+  NameSpace.prototype.service = function(id, serviceImpl) {
+    if (util.isObject(id)) {
+      for (var p in id) {
+        this.serviceIds.push(p);
+        this.services[p] = id[p];
+      }
+    } else {
+      this.serviceIds.push(id);
+      this.services[id] = serviceImpl;
+    }
+    return this;
+  }
+
+  //工作流
+  function Workflow(context, id, sequenceTask) {
+    //命名空间上下文
+    this.context = context;
+    //工作流id
+    this.id = id;
+    //工作流执行任务序列
+    this.sequenceTask = sequenceTask;
+    //任务的切面
+    this.taskaspectIds = {};
+  }
+
+  //工作流运行
+  Workflow.prototype.run = function() {
+    var sequenceTask = this.sequenceTask;
+    var nameSpace = this.context;
+    for (var i = 0; i < sequenceTask.length; i++) {
+      var taskId = sequenceTask[i];
+      nameSpace.tasks[taskId].call(nameSpace, nameSpace.services, nameSpace.tasks);
+    }
+  }
+
+  //通过Namespace运行工作流
+  NameSpace.prototype.run = function(workflowId) {
+    this.workflows[workflowId].run();
+  }
+
+  //工作流创建
+  NameSpace.prototype.workflow = function(id, sequenceTask) {
+    if (arguments.length == 1 && util.isArray(id)) {
+      sequenceTask = id;
+      id = "_anonymous_workflow_" + util.uid();
+    }
+    if (arguments.length == 2 && util.isString(sequenceTask)) {
+      sequenceTask = [sequenceTask];
+    }
+    this.workflowIds.push(id);
+    this.workflows[id] = new Workflow(this, id, sequenceTask);
+    return this.workflows[id];
+  }
+
+  //切面类生成器
+  function Aspect(id, advice) {
+    return function() {
+      this.id = id;
+      this.advice = advice;
+    }
+  }
+
+  /****************切面部分*****************/
+  //切面管理
+  NameSpace.prototype.aspect = function(id, advice) {
+    this.aspectIds.push(id);
+    this.aspects[id] = new Aspect(id, advice);
+    return this;
+  }
+
+  //任务切面
+  NameSpace.prototype.pointCutTask = function(targetTaskIds, aspectIds) {
+    var argLen = arguments.length;
+    var taskIds = this.taskIds;
+    if (arguments.length == 1) {
+      aspectIds = targetTaskIds;
+      targetTaskIds = taskIds;
+    }
+    if (util.isString(aspectIds)) {
+      aspectIds = [aspectIds];
+    }
+    this.pointCut(targetTaskIds, aspectIds, "task");
+    return this;
+  }
+
+  //服务切面
+  NameSpace.prototype.pointCutService = function(targetServiceIds, aspectIds) {
+    var argLen = arguments.length;
+    var serviceIds = this.serviceIds;
+    if (arguments.length == 1) {
+      aspectIds = targetServiceIds;
+      targetServiceIds = serviceIds;
+    }
+    if (util.isString(aspectIds)) {
+      aspectIds = [aspectIds];
+    }
+    this.pointCut(targetServiceIds, aspectIds, "service");
+    return this;
+  }
+
+  //模块切面
+  NameSpace.prototype.pointCutModule = function(targetmoduleIds, aspectIds) {
+    var argLen = arguments.length;
+    var moduleIds = this.moduleIds;
+    if (arguments.length == 1) {
+      aspectIds = targetmoduleIds;
+      targetmoduleIds = moduleIds;
+    }
+    if (util.isString(aspectIds)) {
+      aspectIds = [aspectIds];
+    }
+    this.pointCut(targetmoduleIds, aspectIds, "module");
+    return this;
+  }
+
+  //模块构造函数切面
+  NameSpace.prototype.pointCutModule = function(targetServiceIds, aspectIds) {
+    var argLen = arguments.length;
+    var moduleIds = this.moduleIds;
+    if (arguments.length == 1) {
+      aspectIds = targetmoduleIds;
+      targetmoduleIds = moduleIds;
+    }
+    if (util.isString(aspectIds)) {
+      aspectIds = [aspectIds];
+    }
+    this.pointCut(targetmoduleIds, aspectIds, "moduleFactory");
+    return this;
+  }
+
+  //创建包装函数
+  function createWrapperFunc(targetId, aspectObjs, funcName, srcFunc, nameSpace, type) {
+    return function() {
+      try {
+        //before
+        execAdvice({
+          aspectObjs: aspectObjs,
+          adviceType: "before",
+          returnVal: null,
+          error: null,
+          srcArgs: arguments,
+          nameSpace: nameSpace,
+          targetId: targetId,
+          type: type,
+          funcName: funcName
+        });
+        var returnVal = srcFunc.call(this, arguments);
+
+        //after
+        execAdvice({
+          aspectObjs: aspectObjs,
+          adviceType: "after",
+          returnVal: returnVal,
+          error: null,
+          srcArgs: arguments,
+          nameSpace: nameSpace,
+          targetId: targetId,
+          type: type,
+          funcName: funcName
+        });
+
+      } catch (error) {
+        //err
+        execAdvice({
+          aspectObjs: aspectObjs,
+          adviceType: "error",
+          returnVal: null,
+          error: error,
+          srcArgs: arguments,
+          nameSpace: nameSpace,
+          targetId: targetId,
+          type: type,
+          funcName: funcName
+        });
+      }
+      //TODO事件切面，二期做
+      return returnVal;
+    }
+  }
+  //执行切面
+  function execAdvice(options) {
+    for (var i = 0; i < options.aspectObjs.length; i++) {
+      var joinPoint = {
+        stop: false,
+        srcArgs: options.srcArguments,
+        targetId: options.targetId,
+        type: options.type,
+        nameSpace: options.nameSpace,
+        error: options.error,
+        funcName: options.funcName
+      };
+      if (options.aspectObjs[i].advice[options.adviceType]) options.aspectObjs[i].advice[options.adviceType](joinPoint);
+      if (joinPoint.stop) {
+        break;
+        return false;
+      }
+    }
+  }
+
+  //type:module,moduleFactory,task,service
+  NameSpace.prototype.pointCut = function(targetIds, aspectIds, type) {
+    if (util.isString(targetIds)) targetIds = [targetIds];
+    if (util.isString(aspectIds)) aspectIds = [aspectIds];
+    var argLen = arguments.length;
+    var targetIds = [];
+    var targets = [];
+    var nameSpace = this;
+    if (type == 'task') {
+      targetIds = this.taskIds;
+      targets = this.tasks;
+    }
+    if (type == "service") {
+      targetIds = this.serviceIds;
+      targets = this.services;
+    }
+    //moduleFactory
+    if (type == "moduleFactory") {}
+
+    //module
+    if (type == "module" || type == "moduleFactory") {
+      targetIds = this.moduleIds;
+      targets = this.modules;
+    }
+
+    for (var i = 0; i < targetIds.length; i++) {
+      var targetId = targetIds[i];
+      var target = targets[targetId];
+      var aspectObjs = [];
+      for (var j = 0; j < aspectIds.length; j++) {
+        aspectObjs.push(new this.aspects[aspectIds[j]]());
+      }
+      if (util.isObject(target)) {
+        if (type == "moduleFactory") {
+          target.factory = createWrapperFunc(targetId, aspectObjs, "factory", target.factory);
+        } else if (type == "module") {
+          target.exec();
+          var exports = target.exports;
+          if (util.isFunction(exports)) {
+            target.exports = createWrapperFunc(targetId, aspectObjs, "exports", exports);
+          }
+          if (util.isObject(exports)) {
+            for (var p in exports) {
+              if (util.isFunction(exports[p])) {
+                exports[p] = createWrapperFunc(targetId, aspectObjs, p, exports[p]);
+              }
+            }
+          }
+        } else {
+          for (var p in target) {
+            if (util.isFunction(target[p])) {
+              target[p] = createWrapperFunc(targetId, aspectObjs, p, target[p]);
+            }
+          }
+
+        }
+      }
+      if (util.isFunction(target)) {
+        targets[targetId] = createWrapperFunc(targetId, aspectObjs, targetId, target);
+      }
+    }
+    return this;
+  }
+
+  //工作流里面只有任务切面的语法糖
+  Workflow.prototype.pointCutTask = function(targetTaskIds, aspectIds) {
+    //当只填写切面的时候，
+    if (arguments.length == 1) {
+      aspectIds = targetTaskIds;
+      targetTaskIds = this.sequenceTask;
+    }
+    this.context.pointCutTask(targetTaskIds, aspectIds);
+    return this;
+  }
+
+  global.eco = new NameSpace('eco');
+
+})(this);
