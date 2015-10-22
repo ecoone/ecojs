@@ -520,9 +520,7 @@
   NameSpace.prototype.getUrlByNameSpaceName = function(nameSpaceName) {
     var url = this.configData.nameSpaces[nameSpaceName] ? (this.configData.base + this.configData.nameSpaces[nameSpaceName]) : this.configData.fullNameSpaces[nameSpaceName];
     if (!url) {
-      if (!this.parent) {
-        throw Error("没有发现命名空间" + nameSpaceName + ",在资源配置表中。");
-      } else {
+      if (this.parent) {
         url = this.parent.getUrlByNameSpaceName(nameSpaceName);
       }
     }
