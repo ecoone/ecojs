@@ -77,12 +77,8 @@
         node.src = url
       }
 
-      // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
-      // the end of the insert execution, so use `currentlyAddingScript` to
-      // hold current node, for deriving url in `define` call
       currentlyAddingScript = node
 
-      // ref: #185 & http://dev.jquery.com/ticket/2709
       baseElement ?
         head.insertBefore(node, baseElement) :
         head.appendChild(node)
@@ -93,11 +89,10 @@
     function addOnload(node, callback, isCSS, url) {
       var supportOnload = "onload" in node
 
-      // for Old WebKit and Old Firefox
       if (isCSS && (isOldWebKit || !supportOnload)) {
         setTimeout(function() {
             pollCss(node, callback)
-          }, 1) // Begin after node insertion
+          }, 1) 
         return
       }
 
@@ -119,15 +114,12 @@
       }
 
       function onload(error) {
-        // Ensure only run once and handle memory leak in IE
         node.onload = node.onerror = node.onreadystatechange = null
 
-        // Remove the script to reduce memory leak
         if (!node.rel) {
           head.removeChild(node)
         }
 
-        // Dereference the node
         node = null
 
         callback(error)
@@ -138,22 +130,17 @@
       var sheet = node.sheet
       var isLoaded
 
-      // for WebKit < 536
       if (isOldWebKit) {
         if (sheet) {
           isLoaded = true
         }
       }
-      // for Firefox < 9.0
       else if (sheet) {
         try {
           if (sheet.cssRules) {
             isLoaded = true
           }
         } catch (ex) {
-          // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
-          // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
-          // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
           if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
             isLoaded = true
           }
@@ -162,7 +149,6 @@
 
       setTimeout(function() {
         if (isLoaded) {
-          // Place callback here to give time for style rendering
           callback()
         } else {
           pollCss(node, callback)
