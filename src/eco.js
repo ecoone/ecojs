@@ -159,11 +159,16 @@
   })(util);
 
   //对象扩充
-  util.extend = function(target, obj, deep) {
+  util.extend = function(target, obj, deep,included) {
     var key;
     if (!obj) return target;
-
+    if(util.isArray(deep)){
+      included = deep;
+      deep = false;
+    }
+    if(util.isArray(included)&&included.length==0) included = false;
     for (key in obj) {
+      if(util.isArray(included)&&!util.isInArray(included,key)) continue;
       if (target === obj[key]) continue;
       if (util.isObject(obj[key]) && deep) {
         if (!target[key]) target[key] = {};
@@ -177,9 +182,9 @@
   //事件通讯
   util.events = {};
   util.on = function(name, callback) {
-    var list = util.events[name] || (util.events[name] = [])
+    var list = this.events[name] || (this.events[name] = [])
     list.push(callback)
-    return util
+    return this
   }
 
   util.one = function(name, callback) {
@@ -189,16 +194,16 @@
       callback.call(self, data);
     };
     self.on(name, oneHandler);
-    return util
+    return this
   }
 
   util.off = function(name, callback) {
     if (!(name || callback)) {
-      util.events = {}
-      return util
+      this.events = {}
+      return this
     }
 
-    var list = util.events[name]
+    var list = this.events[name]
     if (list) {
       if (callback) {
         for (var i = list.length - 1; i >= 0; i--) {
@@ -207,11 +212,11 @@
           }
         }
       } else {
-        delete util.events[name]
+        delete this.events[name]
       }
     }
 
-    return util
+    return this
   }
 
   util.emit = function(name, data) {
@@ -352,10 +357,6 @@
     //服务相关
     this.serviceIds = [];
     this.services = {};
-
-    //切面相关
-    this.aspectIds = [];
-    this.aspects = {};
 
     //工作流相关
     this.workflowIds = [];
@@ -803,8 +804,6 @@
     this.id = id;
     //工作流执行任务序列
     this.sequenceTask = sequenceTask;
-    //任务的切面
-    this.taskaspectIds = {};
   }
 
   //工作流运行
@@ -836,225 +835,111 @@
     return this.workflows[id];
   }
 
-  //切面类生成器
+
+ /****************切面部分*****************/
+  //切面类
   function Aspect(id, advice) {
-    return function() {
-      this.id = id;
-      this.advice = advice;
-    }
+    var aspect = {};
+    aspect.id = id;
+    aspect.advice = advice ? advice : {};
+    aspect.pointCut = Aspect.pointCut;
+    aspect._wrapperFunc = Aspect._wrapperFunc;
+    return aspect;
   }
 
-  /****************切面部分*****************/
-  //切面管理
-  NameSpace.prototype.aspect = function(id, advice) {
-    this.aspectIds.push(id);
-    this.aspects[id] = new Aspect(id, advice);
-    return this;
+  //获取函数名
+  Aspect.getMethodName = function(func) {
+    return func.name || func.toString().match(/function\s*([^(]*)\(/)[1];
   }
 
-  //任务切面
-  NameSpace.prototype.pointCutTask = function(targetTaskIds, aspectIds) {
-    var argLen = arguments.length;
-    var taskIds = this.taskIds;
+  //获取对象类型名
+  Aspect.getClassName = function(obj) {
+    return Aspect.getMethodName(obj.constructor);
+  }
+
+  //添加切面
+  Aspect.pointCut = function(context, targetNames) {
     if (arguments.length == 1) {
-      aspectIds = targetTaskIds;
-      targetTaskIds = taskIds;
-    }
-    if (util.isString(aspectIds)) {
-      aspectIds = [aspectIds];
-    }
-    this.pointCut(targetTaskIds, aspectIds, "task");
-    return this;
-  }
-
-  //服务切面
-  NameSpace.prototype.pointCutService = function(targetServiceIds, aspectIds) {
-    var argLen = arguments.length;
-    var serviceIds = this.serviceIds;
-    if (arguments.length == 1) {
-      aspectIds = targetServiceIds;
-      targetServiceIds = serviceIds;
-    }
-    if (util.isString(aspectIds)) {
-      aspectIds = [aspectIds];
-    }
-    this.pointCut(targetServiceIds, aspectIds, "service");
-    return this;
-  }
-
-  //模块切面
-  NameSpace.prototype.pointCutModule = function(targetmoduleIds, aspectIds) {
-    var argLen = arguments.length;
-    var moduleIds = this.moduleIds;
-    if (arguments.length == 1) {
-      aspectIds = targetmoduleIds;
-      targetmoduleIds = moduleIds;
-    }
-    if (util.isString(aspectIds)) {
-      aspectIds = [aspectIds];
-    }
-    this.pointCut(targetmoduleIds, aspectIds, "module");
-    return this;
-  }
-
-  //模块构造函数切面
-  NameSpace.prototype.pointCutModule = function(targetServiceIds, aspectIds) {
-    var argLen = arguments.length;
-    var moduleIds = this.moduleIds;
-    if (arguments.length == 1) {
-      aspectIds = targetmoduleIds;
-      targetmoduleIds = moduleIds;
-    }
-    if (util.isString(aspectIds)) {
-      aspectIds = [aspectIds];
-    }
-    this.pointCut(targetmoduleIds, aspectIds, "moduleFactory");
-    return this;
-  }
-
-  //创建包装函数
-  function createWrapperFunc(targetId, aspectObjs, funcName, srcFunc, nameSpace, type) {
-    return function() {
-      try {
-        //before
-        execAdvice({
-          aspectObjs: aspectObjs,
-          adviceType: "before",
-          returnVal: null,
-          error: null,
-          srcArgs: arguments,
-          nameSpace: nameSpace,
-          targetId: targetId,
-          type: type,
-          funcName: funcName
-        });
-        var returnVal = srcFunc.call(this, arguments);
-
-        //after
-        execAdvice({
-          aspectObjs: aspectObjs,
-          adviceType: "after",
-          returnVal: returnVal,
-          error: null,
-          srcArgs: arguments,
-          nameSpace: nameSpace,
-          targetId: targetId,
-          type: type,
-          funcName: funcName
-        });
-
-      } catch (error) {
-        //err
-        execAdvice({
-          aspectObjs: aspectObjs,
-          adviceType: "error",
-          returnVal: null,
-          error: error,
-          srcArgs: arguments,
-          nameSpace: nameSpace,
-          targetId: targetId,
-          type: type,
-          funcName: funcName
-        });
-      }
-      //TODO事件切面，二期做
-      return returnVal;
-    }
-  }
-  //执行切面
-  function execAdvice(options) {
-    for (var i = 0; i < options.aspectObjs.length; i++) {
-      var joinPoint = {
-        stop: false,
-        srcArgs: options.srcArguments,
-        targetId: options.targetId,
-        type: options.type,
-        nameSpace: options.nameSpace,
-        error: options.error,
-        funcName: options.funcName
-      };
-      if (options.aspectObjs[i].advice[options.adviceType]) options.aspectObjs[i].advice[options.adviceType](joinPoint);
-      if (joinPoint.stop) {
-        break;
-        return false;
-      }
-    }
-  }
-
-  //type:module,moduleFactory,task,service
-  NameSpace.prototype.pointCut = function(targetIds, aspectIds, type) {
-    if (util.isString(targetIds)) targetIds = [targetIds];
-    if (util.isString(aspectIds)) aspectIds = [aspectIds];
-    var argLen = arguments.length;
-    var targetIds = [];
-    var targets = [];
-    var nameSpace = this;
-    if (type == 'task') {
-      targetIds = this.taskIds;
-      targets = this.tasks;
-    }
-    if (type == "service") {
-      targetIds = this.serviceIds;
-      targets = this.services;
-    }
-    //moduleFactory
-    if (type == "moduleFactory") {}
-
-    //module
-    if (type == "module" || type == "moduleFactory") {
-      targetIds = this.moduleIds;
-      targets = this.modules;
-    }
-
-    for (var i = 0; i < targetIds.length; i++) {
-      var targetId = targetIds[i];
-      var target = targets[targetId];
-      var aspectObjs = [];
-      for (var j = 0; j < aspectIds.length; j++) {
-        aspectObjs.push(new this.aspects[aspectIds[j]]());
-      }
-      if (util.isObject(target)) {
-        if (type == "moduleFactory") {
-          target.factory = createWrapperFunc(targetId, aspectObjs, "factory", target.factory);
-        } else if (type == "module") {
-          target.exec();
-          var exports = target.exports;
-          if (util.isFunction(exports)) {
-            target.exports = createWrapperFunc(targetId, aspectObjs, "exports", exports);
+      if (!util.isObject(context)) {
+        targetNames = context;
+        context = global;
+      } else {
+        targetNames = [];
+        for (p in context) {
+          if (util.isFunction(context[p])) {
+            targetNames.push(p);
           }
-          if (util.isObject(exports)) {
-            for (var p in exports) {
-              if (util.isFunction(exports[p])) {
-                exports[p] = createWrapperFunc(targetId, aspectObjs, p, exports[p]);
-              }
-            }
-          }
-        } else {
-          for (var p in target) {
-            if (util.isFunction(target[p])) {
-              target[p] = createWrapperFunc(targetId, aspectObjs, p, target[p]);
-            }
-          }
-
         }
       }
-      if (util.isFunction(target)) {
-        targets[targetId] = createWrapperFunc(targetId, aspectObjs, targetId, target);
-      }
     }
-    return this;
+    if (util.isString(targetNames)) {
+      targetNames = [targetNames];
+    }
+    for (var i = 0; i < targetNames.length; i++) {
+      var targetName = targetNames[i];
+      context[targetName] = this._wrapperFunc(context, targetName);
+    }
+  };
+
+  Aspect._exclused = ["before", "after", "around", "throwing"];
+  Aspect._wrapperFunc = function(context, targetName) {
+    var originTarget = context[targetName];
+    //扩充
+    var advice = util.extend({}, this.advice);
+    if (!context._eventAdvices) context._eventAdvices = {};
+    if (!context._eventAdvices[targetName]) {
+      context._eventAdvices[targetName] = util.extend({}, util, true,["events","on","off","one","emit"]);
+    }
+    var eventAdvice = context._eventAdvices[targetName];
+    return function() {
+      //添加事件通知
+      for (p in advice) {
+        if (util.isFunction(advice[p]) && !util.isInArray(Aspect._exclused, p)) {
+          eventAdvice.on(p, function(eventData){
+            advice.joinPoint.eventDatas[p] = eventData;
+            advice[p].call(advice,advice.joinPoint);
+          });
+        }
+      }
+
+      try {
+        var joinPoint = {
+          context: context,
+          contextName: Aspect.getClassName(context),
+          target: originTarget,
+          targetName: targetName,
+          arguments: arguments,
+          result: "",
+          error: "",
+          stop: false,
+          eventDatas:{}
+        };
+        advice.joinPoint = joinPoint;
+        if (!eventAdvice.joinPoint) eventAdvice.joinPoint = joinPoint;
+        if (advice.before) {
+          advice.before(joinPoint);
+          if (joinPoint.stop) return;
+        }
+        if (advice.around) {
+          advice.around(joinPoint);
+          if (joinPoint.stop) return;
+        } else {
+          joinPoint.result = originTarget.apply(context, arguments);
+        }
+        if (advice.after) {
+          advice.after(joinPoint);
+          if (joinPoint.stop) return;
+        }
+      } catch (error) {
+        if (advice.throwing) {
+          advice.throwing(joinPoint);
+        }
+      }
+      return joinPoint.result;
+    }
   }
 
-  //工作流里面只有任务切面的语法糖
-  Workflow.prototype.pointCutTask = function(targetTaskIds, aspectIds) {
-    //当只填写切面的时候，
-    if (arguments.length == 1) {
-      aspectIds = targetTaskIds;
-      targetTaskIds = this.sequenceTask;
-    }
-    this.context.pointCutTask(targetTaskIds, aspectIds);
-    return this;
-  }
+  NameSpace.prototype.Aspect = Aspect;
 
   global.eco = new NameSpace('eco');
 

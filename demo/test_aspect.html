@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>ecojs切面使用</title>
+      <script src="../src/eco.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+var statTimesFilter = new Aspect("statTimesFilter");
+
+statTimesFilter.advice.before = function(jointPoint){
+	var context = jointPoint.context;
+	var contextName = jointPoint.contextName;
+	var target = jointPoint.target;
+	var targetName = jointPoint.targetName;
+    var arguments = jointPoint.arguments;
+	this.startTime = new Date();
+	this.escape = 0;
+	console.log("统计开始时间："+this.startTime);
+	//用于控制代码是否停止
+	// jointPoint.stop = true;
+	jointPoint.arguments[0] ="change";
+}
+
+statTimesFilter.advice.after = function(jointPoint){
+	var context = jointPoint.context;
+	var contextName = jointPoint.contextName;
+	var target = jointPoint.target;
+	var targetName = jointPoint.targetName;
+    var arguments = jointPoint.arguments;
+    var result = jointPoint.result;
+	this.endTime = new Date();
+    this.escape = this.endTime - this.startTime;
+    console.log("统计结束时间："+this.endTime);
+    console.log("统计时间差："+this.escape);
+}
+
+statTimesFilter.advice.throwing = function(jointPoint){
+	var context = jointPoint.context;
+	var contextName = jointPoint.contextName;
+	var target = jointPoint.target;
+	var targetName = jointPoint.targetName;
+    var arguments = jointPoint.arguments;
+    var error = jointPoint.error;
+    console.error("发生错误："+error);
+}
+
+statTimesFilter.advice.around = function(jointPoint){
+	var context = jointPoint.context;
+	var contextName = jointPoint.contextName;
+	var target = jointPoint.target;
+	var targetName = jointPoint.targetName;
+    var arguments = jointPoint.arguments;
+    var result = jointPoint.result;
+    console.log("进入around");
+    console.log(jointPoint);
+    target.apply(context,arguments);
+}
+
+statTimesFilter.advice.eventName = function(jointPoint){
+	var context = jointPoint.context;
+	var contextName = jointPoint.contextName;
+	var target = jointPoint.target;
+	var targetName = jointPoint.targetName;
+    var arguments = jointPoint.arguments;
+    var result = jointPoint.result;
+    console.log("发生了事件切面");
+}
+
+// 方式1
+var testObj ={
+	f1:function(arg1){
+		console.log(arg1)
+		console.log("f1");
+		if(this._eventAdvices&&this._eventAdvices["f1"]){
+			var eventAdvice  = this._eventAdvices["f1"];
+			var eventData = {aa:"111"};
+			eventAdvice.emit("eventName",eventData);
+		}
+	}
+}
+statTimesFilter.pointCut(testObj,"f1");
+statTimesFilter.pointCut(testObj,"f1");
+testObj.f1("入参1");
+
+//方式2
+// window.f1 = function(){
+// 	console.log("haha,windows f1");
+// }
+// statTimesFilter.pointCut("f1");
+// f1();
+
+//方式3
+// var testObj ={
+// 	f1:function(arg1){
+// 		console.log(arg1)
+// 		console.log("f1");
+// 		if(this._eventAdvices&&this._eventAdvices["f1"]){
+// 			var eventAdvice  = this._eventAdvices["f1"];
+// 			var eventData = {aa:"111"};
+// 			eventAdvice.emit("eventName",eventData);
+// 		}
+// 	},
+// 	f2:function(){
+// 		console.log("f2");
+// 	}
+// }
+// statTimesFilter.pointCut(testObj);
+// testObj.f1("sdsdsd");
+// testObj.f2();
+
+</script>
+</body>
+</html>

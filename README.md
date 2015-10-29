@@ -278,6 +278,81 @@ metaData的结构是
 	   eco.workflow(["render","bindEvent"]).run(); //运行工作流的第一种形式
 
 ##AOP切面
-需要重构暂时不开放
+AOP(Aspect Oriented Programming)面向切面编程，是一种编程范式，提供从另一个角度来考虑程序结构以完善面向对象编程（OOP），AOP为开发者提供了一种描述横切关注点的机制，并能够自动将横切关注点织入到面向对象的软件系统中，从而实现了横切关注点的模块化。我们eco.js的切面模块已经发张出了aspect.js切面组件，以后会和这个项目保持一致
 
-##业务代码开发建议
+###切面
+切面定义：`new namespace.Aspect(aspectId,advice)`。
+
+**aspectId**:切面的名称，必填。
+
+**advice**:通知，选填。
+
+例子：
+
+	var statTimesFilter = new Aspect("statTimesFilter");
+
+###通知
+我们的通知有下面几种类型：before,after,throwing,around,[eventName]。eventName可以是任何事件名.通知可以在切面定义的时候传入，也可以以后定义。
+
+通知定义：`[aspectName].advice.[adviceName] = function(jointPoint)`。
+**jointPoint**:这个连接点的数据对象。结构如下：
+
+	{
+	  context: context,  //目标对象
+	  contextName: Aspect.getClassName(context), //目标对象名字
+	  target: originTarget,  //切面针对的函数，在未加切面原来的样子
+	  targetName: targetName,//函数名字
+	  arguments: arguments,//函数参数
+	  result: "",          //函数返回的数据
+	  error: "",           //针对异常切面，返回的异常数据
+	  stop: false,         //用于阻断函数执行
+	  eventDatas: {}	   //key是某个特定事件切面的名称，value是事件传送的数据
+	}
+	
+例子：
+
+	statTimesFilter.advice.before = function(jointPoint){
+		var context = jointPoint.context;
+		var contextName = jointPoint.contextName;
+		var target = jointPoint.target;
+		var targetName = jointPoint.targetName;
+	    var arguments = jointPoint.arguments;
+		this.startTime = new Date();
+		this.escape = 0;
+		console.log("统计开始时间："+this.startTime);
+		//用于控制代码是否停止
+		// jointPoint.stop = true;
+		jointPoint.arguments[0] ="change";
+	}
+
+
+###连接点
+
+切入点是一组连接点，用于连接目标对象和切面的。
+
+切入点定义：`pointCut(context,targetNames)`。
+
+**context**:目标对象。
+
+**targetNames**:目标对象上要被加上切面的方法名。类型是array或者string
+
+参数可以是1个，也可以是两个。参数为1个的时候，且类型为array或者string，这个参数就是targetNames。如果是object，那么就是context，这个时候的targetNames为这个context上的所有方法。
+
+例子：
+
+	var testObj ={
+		f1:function(arg1){
+			console.log(arg1)
+			console.log("f1");
+			if(this._eventAdvices&&this._eventAdvices["f1"]){ //这里是针对事件切面的
+				var eventAdvice  = this._eventAdvices["f1"];
+				var eventData = {aa:"111"};
+				eventAdvice.emit("eventName",eventData);
+			}
+		}
+	}
+	statTimesFilter.pointCut(testObj,"f1");
+	statTimesFilter.pointCut(testObj,"f1");
+	testObj.f1("入参1");
+
+
