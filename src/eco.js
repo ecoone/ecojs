@@ -1,6 +1,7 @@
-/**
- * eco.js 
- * 生态前端平台
+/*
+ * eco.js生态框架 (https://github.com/TUNIU-OPE/ecojs)
+ * Copyright 2015 mni_Ya
+ * Licensed under the MIT license
  */
 (function(global, undefined) {
   if (global.eco) {

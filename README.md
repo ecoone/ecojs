@@ -286,7 +286,7 @@ metaData的结构是
 	   eco.workflow(["render","bindEvent"]).run(); //运行工作流的第一种形式
 
 ##AOP切面
-AOP(Aspect Oriented Programming)面向切面编程，是一种编程范式，提供从另一个角度来考虑程序结构以完善面向对象编程（OOP），AOP为开发者提供了一种描述横切关注点的机制，并能够自动将横切关注点织入到面向对象的软件系统中，从而实现了横切关注点的模块化。我们eco.js的切面模块已经发张出了aspect.js切面组件，以后会和这个项目保持一致
+AOP(Aspect Oriented Programming)面向切面编程，是一种编程范式，提供从另一个角度来考虑程序结构以完善面向对象编程（OOP），AOP为开发者提供了一种描述横切关注点的机制，并能够自动将横切关注点织入到面向对象的软件系统中，从而实现了横切关注点的模块化。我们已经从ecojs的切面模块发展出了aspectjs切面组件，以后这个功能会在两个项目中保持同步。
 
 ###切面
 切面定义：`new namespace.Aspect(aspectId,advice)`。
