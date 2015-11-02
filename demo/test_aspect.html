@@ -7,7 +7,9 @@
 </head>
 <body>
 <script type="text/javascript">
-var statTimesFilter = new eco.Aspect("statTimesFilter");
+// var statTimesFilter = new eco.Aspect("statTimesFilter");
+//匿名切面
+var statTimesFilter = new eco.Aspect();
 
 statTimesFilter.advice.before = function(jointPoint){
 	var context = jointPoint.context;

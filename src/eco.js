@@ -840,6 +840,13 @@
  /****************切面部分*****************/
   //切面类
   function Aspect(id, advice) {
+    if(arguments.length==1 && util.isObject(id)){
+      advice = id;
+      id = "_anonymous_aspect_"+util.uid();
+    }
+    if(arguments.length==0){
+      id = "_anonymous_aspect_"+util.uid();
+    }
     var aspect = {};
     aspect.id = id;
     aspect.advice = advice ? advice : {};

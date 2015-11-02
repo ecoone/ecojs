@@ -291,9 +291,11 @@ AOP(Aspect Oriented Programming)面向切面编程，是一种编程范式，提
 ###切面
 切面定义：`new namespace.Aspect(aspectId,advice)`。
 
-**aspectId**:切面的名称，必填。
+**aspectId**:切面的id，选填。
 
 **advice**:通知，选填。
+
+当一个参数都不传的时候是创建一个匿名切面。当有一个参数，但这个参数是对象，那么他是advice，这个切面也是匿名切面，如果是string,那么这个参数就是切面名称。
 
 例子：
 
