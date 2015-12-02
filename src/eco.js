@@ -21,6 +21,7 @@
   util.isArray = Array.isArray || util.isType("Array");
   util.isFunction = util.isType("Function");
   util.isUndefined = util.isType("Undefined");
+  util.isBoolean = util.isType("Boolean");
   util.isInArray = function(array, item) {
     for (i = 0; i < array.length; i++) {
       if (array[i] == item)
