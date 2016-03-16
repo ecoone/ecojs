@@ -1,5 +1,5 @@
 /*
- * eco.js生态框架 (https://github.com/TUNIU-OPE/ecojs)
+ * eco.js生态框架 (https://github.com/ecoone/ecojs)
  * Copyright 2015 mni_Ya
  * Licensed under the MIT license
  */
